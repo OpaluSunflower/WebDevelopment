@@ -1,178 +1,94 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Calculator</title>
-        <script>
-            function gen() {
-                
-                const main = document.getElementById("main")
-                const scrn = document.createElement("input")
-                const formule = []
-                scrn.id = "scrn"
-                main.appendChild(scrn)
-                main.appendChild(document.createElement("br"))
-                //#TWORZENIE KLAWISZY NUMERYCZNYCH
-                for (let i = 1;i <= 9;i++)
-                {
-                    
-                    let btn = document.createElement("button")
-                    btn.innerText = i
-                    btn.dataset.value = i
-                    btn.onclick = newSymbol
-                    main.appendChild(btn)
-                    if ((i%3)==0)
-                    {
-                        
-                        main.appendChild(document.createElement("br"))
-                    }   
-                }
-                let btn = document.createElement("button")
-                btn.innerText = 0
-                btn.dataset.value = 0
-                btn.onclick = newSymbol
-                main.appendChild(btn)
-                btn = NaN
-                let ACL = ""
-                //TWORZENIE KLAWISZY NUMERYCZNYCH
-                function checkCorect(symbol)
-                {
-                    function myFunction(value, index, array)
-                    {
-                        return value == symbol
-                    }
-                    const symbols = ['*','/','+','-']
-                    return symbols.some(myFunction)
-                }
-                function newSymbol()
-                {
-                    if (checkCorect(this.dataset.value))
-                    {
-                        if (formule.length != 0)
-                        {
-                            if (checkCorect(formule[formule.length -1]))
-                            {
-                                alert("Błąd znaku")
-                            }
-                            else
-                            {
-                                formule.push(this.dataset.value)
-                                document.getElementById("scrn").value += this.dataset.value
-                            }
-                        }
-                        else if (this.dataset.value == '-')
-                        {
-                            formule.push(this.dataset.value)
-                            document.getElementById("scrn").value += this.dataset.value
 
-                        }
-                        else
-                        {
-                            alert("Błąd znaku")
-                        }
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculator</title>
+    <script>
+        function gen() {
+            const main = document.getElementById("main")
+            const screen = document.createElement("input")
+            screen.id = "screen"
+            main.appendChild(screen)
+            main.appendChild(document.createElement("br"))
+            const Symbols = []
+            ACL = ""
+            //TWORZENIE KLAWISZY NUMERYCZNYCH
+            function numericalButtonFun()
+            {
+                ACL.dataset.value = this.dataset.value
+                document.getElementById("screen").value += this.dataset.value
+            }
+            function operationButtonFun()
+            {
+                Symbols.put(ACL)
+                ACL = ""
+                Symbols.put(this.dataset.value)
+                document.getElementById("screen").value += this.dataset.value
+            }
+            function rewriteFormule(point)
+            {
+                const newSymbols = []
+                let iterator = 0
+                while (iterator != Symbols.length)
+                {
+                    if (iterator != point)
+                    {
+                        newSymbols.push(Symbols[iterator])
                     }
                     else
                     {
-                        formule.push(this.dataset.value)
-                        document.getElementById("scrn").value += this.dataset.value
-
-                    }
+                        newSymbols.push(ACL)
+                        iterator+=3
+                    } 
                 }
-                function writeSymbol()
-                {
-                    formule.push(this.dataset.value)
-                    document.getElementById("scrn").value += this.dataset.value
-                }
-                //KLAWISZE OPERACJI
-                btn = document.createElement("button")
-                btn.innerText = "+"
-                btn.dataset.value = "+"
-                btn.onclick = newSymbol
-                main.appendChild(btn)
-
-                btn = document.createElement("button")
-                btn.innerText = "-"
-                btn.dataset.value = "-"
-                btn.onclick = newSymbol
-                main.appendChild(btn)
-
-                btn = document.createElement("button")
-                btn.innerText = "="
-                btn.dataset.value = "="
-                btn.onclick = result
-                main.appendChild(btn)
-
-                btn = document.createElement("button")
-                btn.innerText = "*"
-                btn.dataset.value = "*"
-                btn.onclick = newSymbol
-                main.appendChild(btn)
-
-                btn = document.createElement("button")
-                btn.innerText = "/"
-                btn.dataset.value = "/"
-                btn.onclick = newSymbol
-                main.appendChild(btn)
-                //KLAWISZE OPERACJI ###
-                function result()
-                {
-                    function rewriteFormule(i)
-                    {
-                        const newForm = []
-                        let iterator = 0
-                        while (iterator < i)
-                        {
-                           newForm.push(formule[iterator]) 
-                           iterator++
-                        }
-                        newForm[iterator]=ACL
-                        ACL = 0
-                        iterator+= 3 //OFFSET PRZESUNIĘCIE
-                        while(iterator < formule.length)
-                        {
-                            newForm.push(formule[iterator])
-                        }
-                        return newForm
-                    }
-                    function searchMultiDiv()
-                    { 
-                        let i = 0
-                        ACL = 0
-                        while (i != (formule.length - 1))
-                        {
-                           if (formule[i] == '*')
-                            {
-                                ACL = formule[i-1] * formule[i+1]
-                                formule = rewriteFormule(i-1)
-                            }
-                            if (formule[i] == '/')
-                            {
-                                ACL = formule[i-1] / formule[i+1]
-                                formule = rewriteFormule(i-1)
-                            }
-                            i++    
-                        }
-                    }
-                    searchMultiDiv()
-                    alert(formule)
-                    let iterator = 0
-                    ACL = 0
-                    while (iterator < formule.length)
-                    {
-                        ACL += formule[iterator]
-                        iterator+=1
-                    }
-                    alert(ACL)
-                }
-                
+                return newSymbols
             }
-                
-        </script>
-    </head>
-    <body onload="gen()">
-        <div id="main">
-        </div>
-        <p id="demo">AAA</p>
-    </body>
+            //KOLEJNOŚĆ WYKONYWANIA DZIAŁAŃ - MNOŻENIE I DZIELENIE
+            function searchMultiDiv()
+            {
+                let iterator = 0
+                while (iterator != Symbols.length)
+                {
+                    if (Symbols[iterator] == '*')
+                    {
+                        ACL = Symbols[iterator - 1 ] * Symbols[iterator + 1]
+                        Symbols = rewriteFormule(iterator -1)
+                    }
+                    if (Symbols[iterator] == '/')
+                    {
+                        ACL = Symbols[iterator - 1 ] * Symbols[iterator + 1]
+                        Symbols = rewriteFormule(iterator -1)
+                    }
+                }
+            }
+            let guzikNumer = 1
+            while (guzikNumer <= 9)
+            {
+                let key0 = document.createElement("button")
+                key0.innerText = guzikNumer
+                key0.onclick = show
+                key0.dataset.value = guzikNumer
+                main.appendChild(key0)
+                if ((guzikNumer % 3) == 0)
+                {
+                    main.appendChild(document.createElement("br"))
+                }
+                guzikNumer++
+            }  
+        }
+        function show() {
+            alert(this.dataset.value)
+            document.getElementById("screen").value += this.dataset.value
+            Symbols.push(this.dataset.value)
+        }
+    </script>
+</head>
+
+<body onload="gen()">
+    <div id="main">
+    </div>
+</body>
+
 </html>
