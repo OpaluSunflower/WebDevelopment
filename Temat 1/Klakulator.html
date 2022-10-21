@@ -17,15 +17,19 @@
             //TWORZENIE KLAWISZY NUMERYCZNYCH
             function numericalButtonFun()
             {
-                ACL.dataset.value = this.dataset.value
+                //alert(this.dataset.value)
+                ACL += this.dataset.value
                 document.getElementById("screen").value += this.dataset.value
+                //Symbols.push(this.dataset.value)
             }
             function operationButtonFun()
             {
-                Symbols.put(ACL)
+                alert(ACL)
+                Symbols.push(ACL)
                 ACL = ""
-                Symbols.put(this.dataset.value)
+                Symbols.push(this.dataset.value)
                 document.getElementById("screen").value += this.dataset.value
+                alert(Symbols)
             }
             function rewriteFormule(point)
             {
@@ -68,7 +72,7 @@
             {
                 let key0 = document.createElement("button")
                 key0.innerText = guzikNumer
-                key0.onclick = show
+                key0.onclick = numericalButtonFun
                 key0.dataset.value = guzikNumer
                 main.appendChild(key0)
                 if ((guzikNumer % 3) == 0)
@@ -76,7 +80,15 @@
                     main.appendChild(document.createElement("br"))
                 }
                 guzikNumer++
-            }  
+            } 
+            const operationSymbols = ['+','-','*','/']
+            operationSymbols.forEach(element => {
+                let key0 = document.createElement("button")
+                key0.innerText = element
+                key0.onclick = operationButtonFun
+                key0.dataset.value = element
+                main.appendChild(key0) 
+            }); 
         }
         function show() {
             alert(this.dataset.value)
