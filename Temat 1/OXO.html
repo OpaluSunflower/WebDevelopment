@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculator</title>
+    <script>
+        function gen() {
+            const main = document.getElementById("main")
+            
+            tab = document.createElement("table")
+            let k = 1
+            let i = 1
+            let XoX = true
+            let whoWin = ""
+            function check()
+            {
+                function checkInner(a,b)
+                {
+                    return (a.innerHTML == b.innerHTML && a.innerHTML != "" && b.innerHTML != "")
+                }
+                let i = 1
+                //KOLUMNY
+                while (i <= 3)
+                {
+                    if (checkInner(document.getElementById(i),document.getElementById(i+3)) &&
+                     checkInner(document.getElementById(i+3),document.getElementById(i+6)))
+                     {
+                        if(document.getElementById(i) != "")
+                        {
+                            whoWin = document.getElementById(i).innerHTML
+                            return true
+                        }
+                        
+                     }
+                     i++
+                }
+                i = 1
+                //WIERSZE
+                while (i <= 3)
+                {
+                    if (checkInner(document.getElementById(i),document.getElementById(i+1)) &&
+                     checkInner(document.getElementById(i+1),document.getElementById(i+2)))
+                     {
+                        whoWin = document.getElementById(i).innerHTML
+                        return true
+                        
+                     }
+                     i+=3
+                }
+                i = 1
+                //SKOSY
+                if (checkInner(document.getElementById(1), document.getElementById(5)) &&
+                    checkInner(document.getElementById(5), document.getElementById(9))) {
+                    whoWin = document.getElementById(1).innerHTML
+                    return true
+                    
+                }
+                if (checkInner(document.getElementById(3), document.getElementById(5)) &&
+                    checkInner(document.getElementById(5, document.getElementById(7)))) {
+                    whoWin = document.getElementById(3).innerHTML
+                    return true
+                }
+
+            }
+            function XOX()
+            {
+                if(XoX)
+                {
+                    this.innerHTML = 'X'
+                    
+                }
+                else
+                {
+                    this.innerHTML = 'O'
+                }
+                XoX = !XoX 
+                if (check())
+                {
+                    alert("Wygrywa: "+whoWin)
+                }
+            }
+            while (i <= 3)
+            {
+                //alert(i)
+                    R = tab.insertRow(-1)
+                    
+                    let j = 1
+                    while(j <= 3)
+                    {
+                        let C = R.insertCell(-1)
+                        //alert("C =")
+                        C.id = k
+                        C.style.backgroundColor = "blue"
+                        C.style.height = "30px"
+                        C.style.width = "30px"
+                        C.style.textAlign = "center"
+                        C.onclick = XOX
+                        j++
+                        k++
+                    }
+                i++
+            }
+            main.appendChild(tab)
+            const key0 = document.createElement("button")
+            function reset()
+            {
+                let i = 1
+                while (i <= 9)
+                {
+                    document.getElementById(i.toString()).innerHTML = ""
+                    i++
+                }
+                whoWin = NaN
+            }
+            key0.innerText = "Reset"
+            key0.onclick = reset
+            main.appendChild(key0)
+        }
+        function show() {
+            alert("Bla")
+        }
+    </script>
+</head>
+
+<body onload="gen()">
+    <div id="main">
+    </div>
+</body>
+
+</html>
