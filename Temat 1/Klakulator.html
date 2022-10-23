@@ -24,28 +24,30 @@
             }
             function operationButtonFun()
             {
-                alert(ACL)
-                Symbols.push(ACL)
+                //alert(ACL)
+                Symbols.push(Number(ACL))
                 ACL = ""
                 Symbols.push(this.dataset.value)
                 document.getElementById("screen").value += this.dataset.value
-                alert(Symbols)
+                //alert(Symbols)
             }
             function rewriteFormule(point)
             {
                 const newSymbols = []
                 let iterator = 0
-                while (iterator != Symbols.length)
+                while (iterator <= (Symbols.length -1))
                 {
                     if (iterator != point)
                     {
                         newSymbols.push(Symbols[iterator])
                     }
                     else
-                    {
+                    {    
                         newSymbols.push(ACL)
-                        iterator+=3
+                        iterator+=2
                     } 
+                    iterator++
+                    alert("Rewrite" + newSymbols)
                 }
                 return newSymbols
             }
@@ -53,19 +55,41 @@
             function searchMultiDiv()
             {
                 let iterator = 0
-                while (iterator != Symbols.length)
+                while (iterator <= (Symbols.length -1))
                 {
                     if (Symbols[iterator] == '*')
                     {
-                        ACL = Symbols[iterator - 1 ] * Symbols[iterator + 1]
-                        Symbols = rewriteFormule(iterator -1)
+                        ACL = Number(Symbols[iterator - 1 ]) * Number(Symbols[iterator + 1])
+                        const NewSymbols = rewriteFormule(iterator -1)
+                        //alert(NewSymbols)
+                        while(Symbols.length != 0)
+                        {
+                            Symbols.pop()
+                        } 
+                        NewSymbols.forEach(element => {
+                            Symbols.push(element)
+                        });
+                        //Symbols = rewriteFormule(iterator -1)
+                        alert("NewSymbols" + Symbols + " -> " + iterator + " len " + (Symbols.length -1))
+                        iterator--
                     }
                     if (Symbols[iterator] == '/')
                     {
-                        ACL = Symbols[iterator - 1 ] * Symbols[iterator + 1]
-                        Symbols = rewriteFormule(iterator -1)
+                        ACL = Number(Symbols[iterator - 1 ]) / Number(Symbols[iterator + 1])
+                        const NewSymbols = rewriteFormule(iterator -1)
+                        while(Symbols.length != 0)
+                        {
+                            Symbols.pop()
+                        } 
+                        NewSymbols.forEach(element => {
+                            Symbols.push(element)
+                        });
+                        //Symbols = rewriteFormule(iterator -1)
+                        iterator--
                     }
+                    iterator+=1
                 }
+                //alert(Symbols)
             }
             let guzikNumer = 1
             while (guzikNumer <= 9)
@@ -81,6 +105,7 @@
                 }
                 guzikNumer++
             } 
+            //TWORZENIE KLAWISZY OPERACJI
             const operationSymbols = ['+','-','*','/']
             operationSymbols.forEach(element => {
                 let key0 = document.createElement("button")
@@ -89,6 +114,46 @@
                 key0.dataset.value = element
                 main.appendChild(key0) 
             }); 
+            function result()
+            {
+                Symbols.push(Number(ACL))
+                alert(Symbols)
+                searchMultiDiv()
+                let iterator = 0
+                ACL = 0
+                alert(Symbols)
+                if (Symbols[iterator] == '-')
+                {
+                    ACL = Symbols[iterator+1] * (-1)
+                    iterator+=2
+                }
+                else
+                {
+                    ACL=Symbols[iterator]
+                    iterator++
+                }
+                while (iterator <= (Symbols.length -1))
+                {
+                    if (Symbols[iterator] == '+')
+                    {
+                        iterator++
+                        ACL +=Symbols[iterator]
+                    }
+                    else if (Symbols[iterator] == '-')
+                    {
+                        iterator++
+                        ACL -=Symbols[iterator]
+                    }
+                    iterator++
+                }
+                document.getElementById("screen").value = ACL
+                
+            }
+            let key0 = document.createElement("button")
+            key0.innerText = '='
+            key0.onclick = result
+            key0.dataset.value = '='
+            main.appendChild(key0) 
         }
         function show() {
             alert(this.dataset.value)
