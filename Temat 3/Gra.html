@@ -9,34 +9,146 @@
     <style>
         /* definiujemy pozycję i rozmiar tkaniny */
         #main {
-            width: 640px;
-            height: 480px;
+            width: 1000px;
+            height: 700px;
             margin: auto;
             border: 1px solid black;
         }
     </style>
+    <script src="test.js"></script>
     <script>
+        
         var canvas
         var ctx // uchwyt kontekstu tkaniny pozwalający na operowanie na niej
-        var pos_x = 320, pos_y = 300 // zmienne pozycji bohatera
+        var pos_x = 490, pos_y = 680 // zmienne pozycji bohatera
         var welcome_screen = true // stan ekranu powitalnego
+        
         /**
         * funkcja rysująca bohatera na tkaninie
         */
+        let belki = []
+        class Belka
+        {
+            constructor(first_belka_pos, belka_velocity)
+            {
+                this.first_belka_pos = first_belka_pos
+                this.belka_velocity = belka_velocity
+            }
+        }
+
+        function ifrst_belka_GT_width(first_belka_pos)
+        {
+            return (first_belka_pos > 900)
+        }
+        function draw_belka(first_belka_pos, i)
+        {
+            if (ifrst_belka_GT_width(first_belka_pos))
+            {
+                ctx.fillRect(first_belka_pos,700 - (i*50), 1000 - first_belka_pos, 20)
+                ctx.fillRect(0,700 - (i*50), first_belka_pos - 900, 20)   
+            }
+            else
+            {
+                ctx.fillRect(first_belka_pos,700 - (i*50), 100, 20)
+            }
+        }
+
+        function erase_belka(first_belka_pos, i)
+        {
+            if (ifrst_belka_GT_width(first_belka_pos))
+            {
+                ctx.clearRect(first_belka_pos,700 - (i*50), 1000 - first_belka_pos, 20)
+                ctx.clearRect(0,700 - (i*50), first_belka_pos - 900, 20)   
+            }
+            else
+            {
+                ctx.clearRect(first_belka_pos,700 - (i*50), 100, 20)
+            }
+        }
+
+        function gen_belki()
+        {
+            ctx.fillStyle = 'rgba(0, 0, 0, 1)';
+            let i = 1
+            while(i <=12)
+            {
+                let hm_belki_on_level = Math.floor(Math.random() * (4 - 1)) + 1
+                let belka_velocity = Math.floor(Math.random() * (10 - 1)) + 1
+                let first_belka_pos = Math.floor(Math.random() * (900 - 1)) + 1
+                let belka = new Belka(first_belka_pos,belka_velocity)
+                belki.push(belka)
+                let j = 1
+                while(j <= 4)
+                {
+                    draw_belka(first_belka_pos,i) 
+                    first_belka_pos += 250
+                    first_belka_pos %= 1000
+                    j++      
+                }
+                i++
+            }
+        }
         function draw_hero() {
-            ctx.save() // zachowanie stanu kontekstu
+            //ctx.save() // zachowanie stanu kontekstu
             ctx.fillStyle = 'rgba(255, 0, 0, 1)'; // ustawienie koloru wypełnienia
-            ctx.translate(pos_x, pos_y) // przesunięcie tkaniny tak, aby narysowny
+            //ctx.translate(pos_x, pos_y) // przesunięcie tkaniny tak, aby narysowny
             // bohater znalazł się w odpowiednim miejscu
-            ctx.fillRect(0, 0, 10, 30) // narysowanie bohatera
-            ctx.restore() // przywrócenie stanu kontekstu
+            ctx.fillRect(pos_x, pos_y, 20, 20) // narysowanie bohatera
+            //ctx.restore() // przywrócenie stanu kontekstu
         }
         /**
         * funkcja wywoływana cyklicznie przerysowująca tkaninę
         */
+       function if_collision()
+       {
+        let k = 0
+            while (k < (belki.length)) {
+                let j = 1
+                let first_belka_pos = belki[k].first_belka_pos
+                while (j <= 4) {
+                    if (pos_x >= (first_belka_pos -19) && pos_x <= first_belka_pos +100 && pos_y >= (700 - ((k+1)*50) -19) && pos_y <= (700 - ((k+1)*50) +19))
+                    {
+                        //alert("ALARM")
+                        ctx.clearRect(pos_x,pos_y,20,20)
+                        pos_x = 490
+                        pos_y = 680
+                        draw_hero()
+                        return true
+                    }
+                    first_belka_pos += 250
+                    first_belka_pos %= 1000
+                    j++
+                }
+                k++
+            } 
+            //alert("yyyy")
+            return false
+       }
         function redraw() {
-            ctx.clearRect(0, 0, 640, 480) // czyszczenie tkaniny
-            draw_hero()
+            ctx.fillStyle = 'rgba(0, 0, 0, 1)';
+            let k = 0
+            while (k < (belki.length)) {
+                let j = 1
+                let first_belka_pos = belki[k].first_belka_pos
+                while (j <= 4) {
+                    erase_belka(first_belka_pos, k+1)
+                    first_belka_pos += 250
+                    first_belka_pos %= 1000
+                    j++
+                }
+                j = 1
+                first_belka_pos = belki[k].first_belka_pos + belki[k].belka_velocity
+                while (j <= 4) {
+                    draw_belka(first_belka_pos, k+1)
+                    first_belka_pos += 250
+                    first_belka_pos %= 1000
+                    j++
+                }
+                belki[k].first_belka_pos += belki[k].belka_velocity
+                belki[k].first_belka_pos %= 1000
+                k++
+            }
+            if_collision()
         }
         /**
         * funkcja inicjalizująca grę i tworząca ekran powitalny
@@ -47,44 +159,58 @@
             canvas = document.getElementById('game')
             // pobranie wskazania na element tkaniny
             ctx = canvas.getContext('2d')
+            ctx.fillStyle = 'rgba(0, 255, 0, 1)'; // ustawienie koloru wypełnienia
+            //ctx.translate(pos_x, pos_y) // przesunięcie tkaniny tak, aby narysowny
+            // bohater znalazł się w odpowiednim miejscu
+            ctx.fillRect(0, 0, 1000, 90) // narysowanie bohatera
             // pobranie kontekstu grafiki dwuwymiarowej dla tkaniny
-            ctx.font = '48px sans-serif'
+            ctx.font = '20px sans-serif'
             ctx.textAlign = 'center'
             // ustawienie dla tkaniny kroju pisma i sposobu wyrównania
             // tekstu
-            ctx.fillText('READY PLAYER ONE?', 320, 240)
+            //test()
+            gen_belki()
+            ctx.fillStyle = 'rgba(204, 0, 103, 1)';
+            ctx.fillText('SPRÓBUJ TUTAJ PODEJŚĆ', 500, 70)
             // umieszczenie napisu na ekranie powitalnym
             draw_hero()
+            setInterval(redraw,20)
+            //setInterval(if_collision(20))
         }
         /**
         * funkcja obsługi klawiatury
         */
         function keyListener(e) {
             if (welcome_screen) { // jeżeli ekran powitalny to wyczyść
-                ctx.clearRect(0, 0, 640, 480)
+                //ctx.clearRect(0, 0, 640, 480)
                 welcome_screen = false
-                window.setInterval(redraw, 10)
+                //window.setInterval(redraw, 10)
                 // podłączenie funckji przerysowania tkaniny
             }
+            ctx.clearRect(pos_x,pos_y,20,20)
             switch (e.keyCode) {
                 case 37: // naciśnięto strzałkę w lewo
                     pos_x -= 10
                     break
                 case 38: // naciśnięto strzałkę w górę
+                    pos_y -= 10
                     break
                 case 39: // naciśnięto strzałkę w prawo
                     pos_x += 10
                     break
                 case 40: // naciśnięto strzałkę w dół
+                    pos_y +=10
                     break
             }
+            draw_hero()
         }
+
     </script>
 </head>
 
 <body onload="init()">
     <div id="main">
-        <canvas id="game" width="640" height="480">
+        <canvas id="game" width="1000" height="700">
             Zacznij w końcu używać współczesnej przeglądarki!
         </canvas>
     </div>
